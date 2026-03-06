@@ -6,7 +6,7 @@
   "scripts": {
     "start:api": "ts-node src/api-server.ts",
     "start:worker": "ts-node src/enrollment-worker.ts",
-    "init": "ts-node src/init.ts",
+    "init": "ts-node scripts/init.ts",
     "build": "tsc"
   },
   "dependencies": {

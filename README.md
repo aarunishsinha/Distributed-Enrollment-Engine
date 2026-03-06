@@ -26,7 +26,9 @@ Ensure you have **Node.js 20+** and **Docker Desktop** installed.
 
 #### 1. Start the Infrastructure (Database, Redis, Kafka)
 ```bash
+cd docker
 docker-compose up -d
+cd ..
 ```
 *Wait a few seconds for the `kafka-setup` container to finish creating the topics.*
 
@@ -59,7 +61,7 @@ I simulated 28,000 inbound requests within 10 seconds (Peak: **2,000 req/sec**).
 ```bash
 # Ensure the infrastructure is running with `npm run start:api` and `npm run start:worker`
 brew install k6
-k6 run flash-sale-test.js
+k6 run tests/load/flash-sale-test.js
 ```
 
 ### The Test Results
