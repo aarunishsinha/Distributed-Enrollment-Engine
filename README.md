@@ -52,9 +52,9 @@ npm run start:worker
 ```
 
 ## 💥 Chaos Engineering: Flash Sale Load Test
-Included in this repository is `flash-sale-test.js`, a hostile `k6` benchmark script to mathematically prove the system's lock mechanisms.
+I have included `flash-sale-test.js` in this repository, a hostile `k6` benchmark script I wrote to mathematically prove the system's lock mechanisms.
 
-We simulated 28,000 inbound requests within 10 seconds (Peak: **2,000 req/sec**). Additionally, the script forced every single simulated user to "Panic Double Click" exactly 50ms apart. Course `CS400` had exactly **50** available seats. 
+I simulated 28,000 inbound requests within 10 seconds (Peak: **2,000 req/sec**). Additionally, the script forced every single simulated user to "Panic Double Click" exactly 50ms apart. Course `CS400` had exactly **50** available seats. 
 
 ```bash
 # Ensure the infrastructure is running with `npm run start:api` and `npm run start:worker`
