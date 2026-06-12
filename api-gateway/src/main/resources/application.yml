@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: enrollment-service
+          uri: ${ENROLLMENT_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/enrollments/**
+          filters:
+            - StripPrefix=1
+            - name: TokenBucketRateLimiter
+
+        - id: course-service-courses
+          uri: ${COURSE_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/courses/**
+          filters:
+            - StripPrefix=1
+
+        - id: course-service-admin
+          uri: ${COURSE_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/admin/**
+          filters:
+            - StripPrefix=1
+
+        - id: course-service-users
+          uri: ${COURSE_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - StripPrefix=1
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+app:
+  rate-limit:
+    rate: 5          # tokens per second
+    burst: 10        # max tokens (burst capacity)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.erp.gateway: INFO
+    org.springframework.cloud.gateway: WARN
