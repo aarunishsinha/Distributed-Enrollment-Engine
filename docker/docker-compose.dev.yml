@@ -1,5 +1,8 @@
 version: '3.8'
 
+# Development compose — uses locally-built JARs (mvn package) for fast iteration.
+# Usage: docker compose -f docker-compose.dev.yml up -d
+
 services:
   # ─── Infrastructure ───────────────────────────────────────────
 
@@ -68,96 +71,6 @@ services:
         kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic enrollment_dlq --partitions 1 --config retention.ms=604800000
         echo 'Topics created successfully.'
       "
-
-  # ─── Application Services ────────────────────────────────────
-
-  api-gateway:
-    build:
-      context: ../api-gateway
-      dockerfile: Dockerfile
-    container_name: erp_gateway
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      REDIS_HOST: redis
-      ENROLLMENT_SERVICE_URL: http://enrollment-service:8081
-      COURSE_SERVICE_URL: http://course-service:8082
-    depends_on:
-      redis:
-        condition: service_healthy
-      enrollment-service:
-        condition: service_started
-      course-service:
-        condition: service_started
-
-  enrollment-service:
-    build:
-      context: ../enrollment-service
-      dockerfile: Dockerfile
-    container_name: erp_enrollment
-    ports:
-      - "8081:8081"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      REDIS_HOST: redis
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-    depends_on:
-      redis:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-
-  enrollment-worker:
-    build:
-      context: ../enrollment-worker
-      dockerfile: Dockerfile
-    container_name: erp_worker
-    ports:
-      - "8083:8083"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/enrollment_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
-    depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      kafka-setup:
-        condition: service_completed_successfully
-
-  course-service:
-    build:
-      context: ../course-service
-      dockerfile: Dockerfile
-    container_name: erp_course
-    ports:
-      - "8082:8082"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/enrollment_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
-      REDIS_HOST: redis
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-    container_name: erp_frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - api-gateway
 
 volumes:
   pgdata:
