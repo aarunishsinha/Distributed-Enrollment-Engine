@@ -1,122 +1,113 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import CourseCatalog from './pages/CourseCatalog';
+import AdminDashboard from './pages/AdminDashboard';
+import MyEnrollments from './pages/MyEnrollments';
+import { ToastContainer, useToast } from './components/Toast';
+import './index.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const USERS = [
+  { id: 'STU-00001', name: 'Alice Chen', role: 'STUDENT' },
+  { id: 'STU-00002', name: 'Bob Martinez', role: 'STUDENT' },
+  { id: 'STU-00003', name: 'Charlie Kim', role: 'STUDENT' },
+  { id: 'STU-00004', name: 'Diana Patel', role: 'STUDENT' },
+  { id: 'STU-00005', name: 'Ethan Okonkwo', role: 'STUDENT' },
+  { id: 'ADMIN-001', name: 'System Admin', role: 'ADMIN' },
+];
+
+function AppContent() {
+  const { toasts, addToast } = useToast();
+  const [currentUser, setCurrentUser] = useState(USERS[0]);
+  const location = useLocation();
+
+  useEffect(() => {
+    localStorage.setItem('currentUserId', currentUser.id);
+    localStorage.setItem('currentUserRole', currentUser.role);
+  }, [currentUser]);
+
+  const handleUserChange = (e) => {
+    const user = USERS.find(u => u.id === e.target.value);
+    if (user) {
+      setCurrentUser(user);
+      addToast(`Switched to ${user.name} (${user.role})`, 'info');
+    }
+  };
+
+  const isAdmin = currentUser.role === 'ADMIN';
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-layout">
+      <ToastContainer toasts={toasts} />
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <div className="sidebar-logo-icon">U</div>
+            <div>
+              <div className="sidebar-logo-text">UniERP</div>
+              <div className="sidebar-logo-badge">Enrollment Engine</div>
+            </div>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <nav className="sidebar-nav">
+          <div className="nav-section-label">Student</div>
+          <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} end>
+            <span className="nav-link-icon">📚</span>
+            Course Catalog
+          </NavLink>
+          <NavLink to="/enrollments" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span className="nav-link-icon">🎓</span>
+            My Enrollments
+          </NavLink>
+
+          {isAdmin && (
+            <>
+              <div className="nav-section-label" style={{ marginTop: '1rem' }}>Administration</div>
+              <NavLink to="/admin" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <span className="nav-link-icon">📊</span>
+                Dashboard
+              </NavLink>
+            </>
+          )}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="nav-section-label" style={{ padding: '0 0 0.4rem' }}>Switch User</div>
+          <select className="user-select" value={currentUser.id} onChange={handleUserChange}>
+            {USERS.map(u => (
+              <option key={u.id} value={u.id}>
+                {u.name} ({u.role})
+              </option>
+            ))}
+          </select>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<CourseCatalog addToast={addToast} />} />
+          <Route path="/enrollments" element={<MyEnrollments addToast={addToast} />} />
+          <Route path="/admin" element={
+            isAdmin
+              ? <AdminDashboard addToast={addToast} />
+              : <div className="empty-state">
+                  <div className="empty-state-icon">🔒</div>
+                  <p className="empty-state-text">Admin access required</p>
+                </div>
+          } />
+        </Routes>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}

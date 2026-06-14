@@ -94,10 +94,12 @@ public class TokenBucketRateLimiter extends AbstractGatewayFilterFactory<TokenBu
             return redisTemplate.execute(
                     rateLimitScript,
                     Collections.singletonList(redisKey),
-                    String.valueOf(defaultRate),
-                    String.valueOf(defaultBurst),
-                    String.valueOf(nowMicros),
-                    "1"  // 1 token per request
+                    java.util.List.of(
+                            String.valueOf(defaultRate),
+                            String.valueOf(defaultBurst),
+                            String.valueOf(nowMicros),
+                            "1"  // 1 token per request
+                    )
             ).next().defaultIfEmpty(1L).flatMap(result -> {
                 if (result == 0L) {
                     // Rate limited

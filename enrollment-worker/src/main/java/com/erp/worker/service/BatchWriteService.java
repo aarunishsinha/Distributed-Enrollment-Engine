@@ -45,16 +45,18 @@ public class BatchWriteService {
 
         try {
             // Attempt batch UPSERT — single SQL round-trip for all events
-            int[] results = jdbcTemplate.batchUpdate(UPSERT_SQL, events, events.size(),
+            int[][] results = jdbcTemplate.batchUpdate(UPSERT_SQL, events, events.size(),
                     (PreparedStatement ps, EnrollmentEvent event) -> {
                         ps.setString(1, event.getCourseId());
                         ps.setString(2, event.getUserId());
                     });
 
             int successCount = 0;
-            for (int result : results) {
-                if (result >= 0 || result == PreparedStatement.SUCCESS_NO_INFO) {
-                    successCount++;
+            for (int[] batch : results) {
+                for (int result : batch) {
+                    if (result >= 0 || result == PreparedStatement.SUCCESS_NO_INFO) {
+                        successCount++;
+                    }
                 }
             }
 

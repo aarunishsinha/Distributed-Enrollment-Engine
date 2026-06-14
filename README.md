@@ -1,89 +1,125 @@
-# Distributed High-Concurrency Enrollment Engine
+# University ERP — Distributed Enrollment Engine
 
-A fault-tolerant, high-concurrency event-driven course registration API built natively to handle massive "flash sale" traffic spikes.
+A production-grade, microservices-based university enrollment system designed to handle **flash-sale traffic patterns** at **10,000+ RPS** with zero overbooking.
 
-Tested up to **2,000 requests/second** with absolute zero inventory overbooking and bulletproof idempotency mechanisms to catch and deny hostile "panic double-clicks".
+## Architecture
 
-## 🏗 System Architecture 
-- **Language**: TypeScript (Node.js)
-- **API Cache & Concurrency Controller**: Redis 7
-- **Event Bus / Message Queue**: Apache Kafka (KRaft mode)
-- **Persistent Storage**: PostgreSQL 15
+```
+Frontend (React)  →  API Gateway (Spring Cloud Gateway)
+                         │  Token Bucket Rate Limiter
+                         ├─→ Enrollment Service (Spring Boot + Virtual Threads)
+                         │       Redis Lua: Seat Reservation + Idempotency
+                         │       Kafka Produce → enrollment_reserved
+                         │
+                         └─→ Course Service (Spring Boot + JPA)
+                                 CRUD, Search, Analytics, User Management
+                                        
+Kafka (6 partitions) → Enrollment Worker (Batch Consumer)
+                            Batch UPSERT to PostgreSQL (200 rows/batch)
+                            DLQ routing on failure → enrollment_dlq
+```
 
-### Core Components
-1. **API Gateway (Producer)**: Exposes `POST /v1/enrollments`. 
-   - Intercepts incoming requests and uses an immediate **Redis Idempotency Check** to prevent duplicate submissions from the same user session.
-   - For valid, non-duplicate requests, it utilizes an atomic **Redis Lua Script** to instantly check real-time course capacity and reserves the seat natively in memory.
-   - Successful seat reservations are then published asynchronously to the Kafka `enrollment_reserved` topic.
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| API Gateway | Spring Cloud Gateway | Rate limiting (Token Bucket), routing, CORS |
+| Enrollment Service | Spring Boot 3.3 + Java 21 Virtual Threads | Hot path: idempotency → seat reservation → Kafka produce |
+| Enrollment Worker | Spring Boot 3.3 + Spring Kafka | Batched Kafka consumer → PostgreSQL UPSERT |
+| Course Service | Spring Boot 3.3 + Spring Data JPA | CRUD, substring search, analytics, user management |
+| Frontend | React 18 + Vite | Course catalog, enrollment, admin dashboard |
+| Database | PostgreSQL 15 | Persistent storage for users, courses, enrollments |
+| Cache | Redis 7 | Seat cache, idempotency, rate limiting |
+| Message Broker | Apache Kafka (KRaft) | Async write decoupling, DLQ |
 
-2. **Background Worker (Consumer)**: Listens to Kafka.
-   - Drains the `enrollment_reserved` event stream at a controlled, steady pace. Continually commits Kafka offsets to ensure the system is crash-resistant.
-   - Executes a strict idempotent PostgreSQL `UPSERT` utilizing a `UNIQUE(course_id, user_id)` constraint. 
-   - Non-transient errors (like foreign key violations or data mismatch errors) are gracefully dead-lettered to an `enrollment_dlq` topic.
+## Quick Start
 
-## 🚀 Quick Start (Local Setup)
-Ensure you have **Node.js 20+** and **Docker Desktop** installed.
+### Prerequisites
+- **Java 21** (for local development)
+- **Docker Desktop** (for infrastructure + full-stack)
+- **Node.js 20+** (for frontend development)
+- **Maven 3.9+** (for building Java services)
 
-#### 1. Start the Infrastructure (Database, Redis, Kafka)
+### Option 1: Full Stack via Docker Compose
 ```bash
 cd docker
-docker-compose up -d
-cd ..
+docker compose up --build -d
 ```
-*Wait a few seconds for the `kafka-setup` container to finish creating the topics.*
+Wait ~2 minutes for all services to start. Then:
+- **Frontend**: http://localhost:3000
+- **API Gateway**: http://localhost:8080
+- **Enrollment Service**: http://localhost:8081
+- **Course Service**: http://localhost:8082
 
-#### 2. Install Dependencies
+### Option 2: Local Development
+
+1. **Start infrastructure only:**
 ```bash
-npm install
+cd docker
+docker compose up postgres redis kafka kafka-setup -d
 ```
 
-#### 3. Build & Initialize the Data
-This initializes the PostgreSQL container schema and pre-loads the available seats to Redis.
+2. **Build and run each service** (in separate terminals):
 ```bash
-npm run build
-npm run init
+# Enrollment Service
+cd enrollment-service && mvn spring-boot:run
+
+# Enrollment Worker
+cd enrollment-worker && mvn spring-boot:run
+
+# Course Service
+cd course-service && mvn spring-boot:run
+
+# API Gateway
+cd api-gateway && mvn spring-boot:run
 ```
 
-#### 4. Start the Application
-Run these in two separate terminal windows:
+3. **Start frontend:**
 ```bash
-npm run start:api
-```
-```bash
-npm run start:worker
+cd frontend && npm install && npm run dev
 ```
 
-## 💥 Chaos Engineering: Flash Sale Load Test
-I have included `flash-sale-test.js` in this repository, a hostile `k6` benchmark script I wrote to mathematically prove the system's lock mechanisms.
+## API Endpoints
 
-I simulated 28,000 inbound requests within 10 seconds (Peak: **2,000 req/sec**). Additionally, the script forced every single simulated user to "Panic Double Click" exactly 50ms apart. Course `CS400` had exactly **50** available seats. 
+### Enrollment (via Gateway at :8080)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/enrollments` | Enroll in a course (rate limited) |
 
-```bash
-# Ensure the infrastructure is running with `npm run start:api` and `npm run start:worker`
-brew install k6
-k6 run tests/load/flash-sale-test.js
+### Courses
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/courses` | List courses (paginated) |
+| GET | `/api/v1/courses/search?q=comp` | Substring search |
+| GET | `/api/v1/courses/{id}` | Course detail |
+| POST | `/api/v1/courses` | Add course (admin) |
+| DELETE | `/api/v1/courses/{id}` | Remove course (admin) |
+
+### Admin
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/admin/analytics` | Enrollment analytics |
+| GET/POST/DELETE | `/api/v1/admin/users` | User management |
+
+## Design Document
+
+See [DESIGN.md](DESIGN.md) for:
+- Requirements & NFRs
+- Entity relationship diagrams
+- Full throughput math (10K RPS analysis)
+- Rate limiting algorithm comparison
+- DLQ strategy with partial batch failure handling
+- Inter-service communication decisions
+
+## Project Structure
+
 ```
-
-### The Test Results
-1. **Idempotency Held**: 13,949 duplicate "Panic Clicks" were immediately blocked at the Redis edge and returned a safe HTTP 409 Conflict.
-2. **Concurrency Safe**: 13,949 users were gracefully denied with HTTP 400 "Course Full" once the 50 seats were gone.
-3. **Zero Overbooking Guarantee**: A direct query to the PostgreSQL production tables confirms exactly 50 unique rows were created.
-
-#### Post-Test Verification Queries:
-```sql
-docker exec -i enrollment_postgres psql -U postgres -d enrollment_db -c "SELECT COUNT(*) FROM enrollments WHERE course_id='CS400';"
-
- count 
--------
-    50
-(1 row)
-```
-
-**Did anyone accidentally double book?**
-```sql
-docker exec -i enrollment_postgres psql -U postgres -d enrollment_db -c "SELECT user_id, COUNT(*) FROM enrollments WHERE course_id = 'CS400' GROUP BY user_id HAVING COUNT(*) > 1;"
-
- user_id | count 
----------+-------
-(0 rows)
+├── old/                    # Original TypeScript prototype
+├── docker/                 # Docker Compose + PostgreSQL schema
+├── api-gateway/            # Spring Cloud Gateway (rate limiter)
+├── enrollment-service/     # Flash-sale hot path
+├── enrollment-worker/      # Kafka batch consumer
+├── course-service/         # CRUD, search, analytics, users
+├── frontend/               # React + Vite
+├── data/                   # Seed datasets
+├── DESIGN.md               # System design document
+└── README.md               # This file
 ```
