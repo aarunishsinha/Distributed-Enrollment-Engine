@@ -56,3 +56,35 @@ INSERT INTO users (user_id, username, email, role) VALUES
     ('STU-00003', 'Charlie Kim', 'charlie.kim@university.edu', 'STUDENT'),
     ('STU-00004', 'Diana Patel', 'diana.patel@university.edu', 'STUDENT'),
     ('STU-00005', 'Ethan Okonkwo', 'ethan.okonkwo@university.edu', 'STUDENT');
+
+-- Triggers to automatically sync available_seats in courses table
+CREATE OR REPLACE FUNCTION decrement_course_seats()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE courses 
+    SET available_seats = available_seats - 1 
+    WHERE course_id = NEW.course_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_decrement_course_seats
+AFTER INSERT ON enrollments
+FOR EACH ROW
+EXECUTE FUNCTION decrement_course_seats();
+
+CREATE OR REPLACE FUNCTION increment_course_seats()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE courses 
+    SET available_seats = available_seats + 1 
+    WHERE course_id = OLD.course_id;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_increment_course_seats
+AFTER DELETE ON enrollments
+FOR EACH ROW
+EXECUTE FUNCTION increment_course_seats();
+
