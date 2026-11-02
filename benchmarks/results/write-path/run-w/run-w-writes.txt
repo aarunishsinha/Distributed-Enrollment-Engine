@@ -1,0 +1,8 @@
+course:              FLASH-BIG
+lag at k6 end:       0
+final lag:           0
+drain time:          2s (k6 end -> lag 0)
+accepted (Redis):    75000
+persisted (Postgres): 75000
+DLQ delta:           0
+result:              PASS (accepted == persisted, no DLQ)
