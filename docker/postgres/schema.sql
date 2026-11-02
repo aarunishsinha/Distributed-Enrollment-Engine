@@ -30,7 +30,7 @@ CREATE TABLE courses (
 CREATE TABLE enrollments (
     enrollment_id   SERIAL PRIMARY KEY,
     course_id       VARCHAR(50) REFERENCES courses(course_id),
-    user_id         VARCHAR(50) REFERENCES users(user_id),
+    user_id         VARCHAR(50) NOT NULL,
     status          VARCHAR(20) DEFAULT 'CONFIRMED',
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(course_id, user_id)
