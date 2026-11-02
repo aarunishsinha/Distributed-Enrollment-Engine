@@ -1,0 +1,213 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: tests/load/flash-sale-10k.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 5000 max VUs, 1m5s max duration (incl. graceful stop):
+              * flash_sale_spike: Up to 10000.00 iterations/s for 35s over 5 stages (maxVUs: 1000-5000, gracefulStop: 30s)
+
+
+running (0m00.9s), 0113/1000 VUs, 43 complete and 0 interrupted iterations
+flash_sale_spike   [   3% ] 0113/1000 VUs  00.9s/35s  00353.84 iters/s
+
+running (0m01.9s), 0362/1000 VUs, 347 complete and 0 interrupted iterations
+flash_sale_spike   [   5% ] 0363/1000 VUs  01.9s/35s  00754.45 iters/s
+
+running (0m02.9s), 1033/1034 VUs, 559 complete and 0 interrupted iterations
+flash_sale_spike   [   8% ] 1033/1034 VUs  02.9s/35s  01153.60 iters/s
+
+running (0m03.9s), 1312/1312 VUs, 719 complete and 0 interrupted iterations
+flash_sale_spike   [  11% ] 1312/1312 VUs  03.9s/35s  01553.96 iters/s
+
+running (0m04.9s), 1554/1554 VUs, 1564 complete and 0 interrupted iterations
+flash_sale_spike   [  14% ] 1554/1554 VUs  04.9s/35s  01953.97 iters/s
+
+running (0m05.9s), 2032/2032 VUs, 1883 complete and 0 interrupted iterations
+flash_sale_spike   [  17% ] 2032/2032 VUs  05.9s/35s  02530.89 iters/s
+
+running (0m06.9s), 2446/2446 VUs, 2641 complete and 0 interrupted iterations
+flash_sale_spike   [  20% ] 2446/2446 VUs  06.9s/35s  03130.91 iters/s
+
+running (0m07.9s), 2760/2760 VUs, 2900 complete and 0 interrupted iterations
+flash_sale_spike   [  23% ] 2760/2760 VUs  07.9s/35s  03730.93 iters/s
+
+running (0m08.9s), 2972/2972 VUs, 3204 complete and 0 interrupted iterations
+flash_sale_spike   [  25% ] 2972/2972 VUs  08.9s/35s  04331.48 iters/s
+
+running (0m09.9s), 3398/3398 VUs, 3404 complete and 0 interrupted iterations
+flash_sale_spike   [  28% ] 3398/3398 VUs  09.9s/35s  04930.84 iters/s
+
+running (0m10.9s), 3791/3791 VUs, 3909 complete and 0 interrupted iterations
+flash_sale_spike   [  31% ] 3791/3791 VUs  10.9s/35s  05442.21 iters/s
+
+running (0m11.9s), 4161/4161 VUs, 4186 complete and 0 interrupted iterations
+flash_sale_spike   [  34% ] 4161/4161 VUs  11.9s/35s  05942.26 iters/s
+
+running (0m12.9s), 4333/4333 VUs, 4537 complete and 0 interrupted iterations
+flash_sale_spike   [  37% ] 4333/4333 VUs  12.9s/35s  06442.30 iters/s
+
+running (0m13.9s), 4577/4577 VUs, 5227 complete and 0 interrupted iterations
+flash_sale_spike   [  40% ] 4577/4577 VUs  13.9s/35s  06942.27 iters/s
+
+running (0m14.9s), 4859/4862 VUs, 5729 complete and 0 interrupted iterations
+flash_sale_spike   [  43% ] 4859/4862 VUs  14.9s/35s  07432.79 iters/s
+
+running (0m15.9s), 5000/5000 VUs, 6174 complete and 0 interrupted iterations
+flash_sale_spike   [  45% ] 5000/5000 VUs  15.9s/35s  07942.31 iters/s
+
+running (0m16.9s), 5000/5000 VUs, 6675 complete and 0 interrupted iterations
+flash_sale_spike   [  48% ] 5000/5000 VUs  16.9s/35s  08442.38 iters/s
+
+running (0m17.9s), 5000/5000 VUs, 7498 complete and 0 interrupted iterations
+flash_sale_spike   [  51% ] 5000/5000 VUs  17.9s/35s  08942.30 iters/s
+
+running (0m18.9s), 5000/5000 VUs, 8092 complete and 0 interrupted iterations
+flash_sale_spike   [  54% ] 5000/5000 VUs  18.9s/35s  09442.42 iters/s
+
+running (0m19.9s), 5000/5000 VUs, 8508 complete and 0 interrupted iterations
+flash_sale_spike   [  57% ] 5000/5000 VUs  19.9s/35s  09942.83 iters/s
+
+running (0m20.9s), 5000/5000 VUs, 8627 complete and 0 interrupted iterations
+flash_sale_spike   [  60% ] 5000/5000 VUs  20.9s/35s  10000.00 iters/s
+
+running (0m21.9s), 5000/5000 VUs, 8640 complete and 0 interrupted iterations
+flash_sale_spike   [  63% ] 5000/5000 VUs  21.9s/35s  10000.00 iters/s
+
+running (0m22.9s), 5000/5000 VUs, 8640 complete and 0 interrupted iterations
+flash_sale_spike   [  65% ] 5000/5000 VUs  22.9s/35s  10000.00 iters/s
+
+running (0m23.9s), 5000/5000 VUs, 8714 complete and 0 interrupted iterations
+flash_sale_spike   [  68% ] 5000/5000 VUs  23.9s/35s  10000.00 iters/s
+
+running (0m24.9s), 5000/5000 VUs, 8825 complete and 0 interrupted iterations
+flash_sale_spike   [  71% ] 5000/5000 VUs  24.9s/35s  10000.00 iters/s
+
+running (0m25.9s), 5000/5000 VUs, 9100 complete and 0 interrupted iterations
+flash_sale_spike   [  74% ] 5000/5000 VUs  25.9s/35s  10000.00 iters/s
+
+running (0m26.9s), 5000/5000 VUs, 9312 complete and 0 interrupted iterations
+flash_sale_spike   [  77% ] 5000/5000 VUs  26.9s/35s  10000.00 iters/s
+
+running (0m27.9s), 5000/5000 VUs, 9312 complete and 0 interrupted iterations
+flash_sale_spike   [  80% ] 5000/5000 VUs  27.9s/35s  10000.00 iters/s
+
+running (0m28.9s), 5000/5000 VUs, 9425 complete and 0 interrupted iterations
+flash_sale_spike   [  83% ] 5000/5000 VUs  28.9s/35s  10000.00 iters/s
+
+running (0m29.9s), 5000/5000 VUs, 9458 complete and 0 interrupted iterations
+flash_sale_spike   [  85% ] 5000/5000 VUs  29.9s/35s  10000.00 iters/s
+
+running (0m30.9s), 4763/5000 VUs, 9816 complete and 0 interrupted iterations
+flash_sale_spike   [  88% ] 4763/5000 VUs  30.9s/35s  09884.84 iters/s
+
+running (0m31.9s), 4590/5000 VUs, 10429 complete and 0 interrupted iterations
+flash_sale_spike   [  91% ] 4590/5000 VUs  31.9s/35s  09797.01 iters/s
+
+running (0m32.9s), 5000/5000 VUs, 10782 complete and 0 interrupted iterations
+flash_sale_spike   [  94% ] 5000/5000 VUs  32.9s/35s  04230.60 iters/s
+
+running (0m33.9s), 5000/5000 VUs, 11251 complete and 0 interrupted iterations
+flash_sale_spike   [  97% ] 5000/5000 VUs  33.9s/35s  02230.25 iters/s
+
+running (0m34.9s), 4952/5000 VUs, 11863 complete and 0 interrupted iterations
+flash_sale_spike   [ 100% ] 4952/5000 VUs  34.9s/35s  00232.34 iters/s
+
+running (0m35.9s), 3958/5000 VUs, 12870 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m36.9s), 3958/5000 VUs, 12870 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m37.9s), 3955/5000 VUs, 12873 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m38.9s), 3954/5000 VUs, 12874 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m39.9s), 3953/5000 VUs, 12875 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m40.9s), 3181/5000 VUs, 13647 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m41.9s), 2877/5000 VUs, 13951 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m42.9s), 2578/5000 VUs, 14250 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+running (0m43.9s), 1833/5000 VUs, 14995 complete and 0 interrupted iterations
+flash_sale_spike ↓ [ 100% ] 4901/5000 VUs  35s  00031.62 iters/s
+
+
+  █ THRESHOLDS 
+
+    http_reqs{status:0}
+    ✓ 'count>=0' count=0
+
+    http_reqs{status:202}
+    ✓ 'count>=0' count=100
+
+    http_reqs{status:400}
+    ✓ 'count>=0' count=16728
+
+    http_reqs{status:409}
+    ✓ 'count>=0' count=16824
+
+    http_reqs{status:429}
+    ✓ 'count>=0' count=0
+
+    http_reqs{status:500}
+    ✓ 'count>=0' count=4
+
+    http_reqs{status:503}
+    ✓ 'count>=0' count=0
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 33656  751.929388/s
+    checks_succeeded...: 99.98% 33651 out of 33656
+    checks_failed......: 0.01%  5 out of 33656
+
+    ✗ status is 202 or 400 or 409 or 429
+      ↳  99% — ✓ 16827 / ✗ 1
+    ✗ double-click rejected (409)
+      ↳  99% — ✓ 16824 / ✗ 4
+
+    HTTP
+    http_req_duration..............: avg=5.01s  p(50)=3.6s  p(95)=13.29s p(99)=13.79s max=14.04s
+      { expected_response:true }...: avg=4.83s  p(50)=4.83s p(95)=5.08s  p(99)=5.13s  max=5.15s 
+    http_req_failed................: 99.70% 33556 out of 33656
+    http_reqs......................: 33656  751.929388/s
+      { status:0 }.................: 0      0/s
+      { status:202 }...............: 100    2.234161/s
+      { status:400 }...............: 16728  373.730533/s
+      { status:409 }...............: 16824  375.875328/s
+      { status:429 }...............: 0      0/s
+      { status:500 }...............: 4      0.089366/s
+      { status:503 }...............: 0      0/s
+
+    EXECUTION
+    dropped_iterations.............: 205671 4595.022261/s
+    iteration_duration.............: avg=10.03s p(50)=7.93s p(95)=18.69s p(99)=22.57s max=24.69s
+    iterations.....................: 16828  375.964694/s
+    vus............................: 1833   min=113            max=5000
+    vus_max........................: 5000   min=1000           max=5000
+
+    NETWORK
+    data_received..................: 9.0 MB 201 kB/s
+    data_sent......................: 8.2 MB 183 kB/s
+
+
+
+
+running (0m44.8s), 0000/5000 VUs, 16828 complete and 0 interrupted iterations
+flash_sale_spike ✓ [ 100% ] 0000/5000 VUs  35s  00031.62 iters/s

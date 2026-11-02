@@ -3,12 +3,24 @@ import { check } from 'k6';
 import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
 // Configurable via env: k6 run -e PEAK=5000 -e COURSE_ID=CS-102 flash-sale-10k.js
+//   MODE=spike      (default) 20% → 50% → PEAK spike, hold, cool down
+//   MODE=breakpoint ramp 0 → PEAK over RAMP, abort once p95 > 1s or >1% of requests fail
+//   MODE=constant   hold RATE iterations/s for DURATION
+// Rates are iterations/s; each iteration sends 2 requests.
+const MODE = __ENV.MODE || 'spike';
 const PEAK = Number(__ENV.PEAK || 10000);
+const RAMP = __ENV.RAMP || '5m';
+const RATE = Number(__ENV.RATE || 300);
+const DURATION = __ENV.DURATION || '60s';
 const COURSE_ID = __ENV.COURSE_ID || 'CS-101';
 
-// Traffic Spike Configuration targeting PEAK RPS (default 10K)
-export const options = {
-    scenarios: {
+// 400 (full / already enrolled), 409 (duplicate) and 429 (rate limited) are correct business
+// responses, so http_req_failed only counts real failures (5xx, network errors)
+http.setResponseCallback(http.expectedStatuses(202, 400, 409, 429));
+
+const SCENARIOS = {
+    // Traffic Spike Configuration targeting PEAK iterations/s (default 10K)
+    spike: {
         flash_sale_spike: {
             executor: 'ramping-arrival-rate',
             startRate: 0,
@@ -24,8 +36,45 @@ export const options = {
             ],
         },
     },
+    // Slow linear ramp to find the throughput knee
+    breakpoint: {
+        flash_sale_breakpoint: {
+            executor: 'ramping-arrival-rate',
+            startRate: 0,
+            timeUnit: '1s',
+            preAllocatedVUs: 500,
+            maxVUs: 5000,
+            stages: [{ target: PEAK, duration: RAMP }],
+        },
+    },
+    // Steady rate to confirm a sustainable throughput
+    constant: {
+        flash_sale_constant: {
+            executor: 'constant-arrival-rate',
+            rate: RATE,
+            timeUnit: '1s',
+            duration: DURATION,
+            preAllocatedVUs: 500,
+            maxVUs: 5000,
+        },
+    },
+};
+
+if (!SCENARIOS[MODE]) {
+    throw new Error(`Unknown MODE "${MODE}" (expected spike, breakpoint or constant)`);
+}
+
+// Stop the breakpoint ramp once the system is past its limit
+const ABORT_THRESHOLDS = MODE === 'breakpoint' ? {
+    http_req_duration: [{ threshold: 'p(95)<1000', abortOnFail: true, delayAbortEval: '10s' }],
+    http_req_failed: [{ threshold: 'rate<0.01', abortOnFail: true, delayAbortEval: '10s' }],
+} : {};
+
+export const options = {
+    scenarios: SCENARIOS[MODE],
     // Dummy thresholds: k6 only reports per-status counts for sub-metrics with a threshold
     thresholds: {
+        ...ABORT_THRESHOLDS,
         'http_reqs{status:202}': ['count>=0'],
         'http_reqs{status:400}': ['count>=0'],
         'http_reqs{status:409}': ['count>=0'],
